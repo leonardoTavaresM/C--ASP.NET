@@ -3,6 +3,7 @@ using ScreenSound.API.Requests;
 using ScreenSound.API.Response;
 using ScreenSound.DB;
 using ScreenSound.Models;
+using ScreenSound.Shared.Models.Models;
 
 namespace ScreenSound.API.Endpoints;
 
@@ -36,12 +37,16 @@ public static class MusicsExtensions
         app.MapPost("/musics", ([FromServices] DAL<Music> dal, [FromBody] MusicRequest musicRequest) =>
         {
             var existingMusic = dal.GetBy(m => m.Name!.Equals(musicRequest.name, StringComparison.OrdinalIgnoreCase));
+
             if (existingMusic is not null)
             {
                 return Results.BadRequest("This song already exists");
             }
 
-            var music = new Music(musicRequest.name, musicRequest.releaseYear);
+            var music = new Music(musicRequest.name, musicRequest.releaseYear, musicRequest.artistId)
+            {
+                Genres = musicRequest.Genres is not null? GenderRequestParser(musicRequest.Genres) : new List<Gender>()
+            };
             dal.Add(music);
             return Results.Ok(EntityToResponse(music));
         });
@@ -75,11 +80,20 @@ public static class MusicsExtensions
         });
     }
 
+    private static ICollection<Gender> GenderRequestParser(ICollection<GenderRequest> genres)
+    {
+        return genres.Select(a => RequestToEntity(a)).ToList();
+    }
+
+    private static Gender RequestToEntity(GenderRequest gender)
+    {
+        return new Gender(gender.Name, gender.Description);
+    }
 
     private static MusicResponse EntityToResponse(Music music)
     {
 
-        return new MusicResponse(music.Id, music.Name!, music.Artist.Id, music.Artist.Name);
+        return new MusicResponse(music.Id, music.Name!, music.ReleaseYear ?? 0, music.Artist?.Name ?? "Unknown Artist", music.ArtistId ?? 0);
     }
 
     private static ICollection<MusicResponse> EntityListToResponseList(IEnumerable<Music> musicList)

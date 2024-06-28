@@ -1,3 +1,5 @@
-﻿namespace ScreenSound.API.Requests;
+﻿using ScreenSound.Models;
 
-public record MusicRequestEdit(int id, string name, int ArtistaId, int releaseYear);
+namespace ScreenSound.API.Requests;
+
+public record MusicRequestEdit(int id, string name, int releaseYear, int? artistId);

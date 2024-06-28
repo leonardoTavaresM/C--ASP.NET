@@ -37,7 +37,7 @@ public static class ArtistsExtensions
         {
             var artist = new Artist(artistRequest.name, artistRequest.bio);
             dal.Add(artist);
-            return Results.Ok(artistRequest);
+            return Results.Ok(artist);
         });
          
         app.MapDelete("/artists/{id}", ([FromServices] DAL<Artist> dal, int id) =>
@@ -57,7 +57,7 @@ public static class ArtistsExtensions
             var updateArtist = dal.GetBy(a => a.Id == artistRequestEdit.id);
             if (updateArtist is null)
             {
-                return Results.NotFound("Artist no found");
+                return Results.NotFound("Artist not found");
             }
 
             updateArtist.Name = artistRequestEdit.name;
