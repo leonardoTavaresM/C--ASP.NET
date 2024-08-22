@@ -10,7 +10,7 @@ public class Artist
         Bio = bio;
         ProfilePhoto = profilePhoto ?? "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png";
     }
-
+// teste
     public string Name { get; set; }
     public string ProfilePhoto { get; set; }
     public string Bio { get; set; }
