@@ -18,9 +18,17 @@ public class ScreenSoundContext: DbContext
         "Application Intent=ReadWrite;" +
         "Multi Subnet Failover=False";
 
+    public ScreenSoundContext(DbContextOptions options) : base (options) 
+    {
+        
+    }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+        if(optionsBuilder.IsConfigured)
+        {
+            return;
+        }
         optionsBuilder
             .UseSqlServer(connectionString)
             .UseLazyLoadingProxies(false);

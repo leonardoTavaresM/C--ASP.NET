@@ -62,7 +62,7 @@ public static class GenresExtensions
 
     private static GenderResponse EntityToResponse(Gender gender)
     {
-        return new GenderResponse(gender.Name, gender.Description);
+        return new GenderResponse(gender.Id, gender.Name, gender.Description);
     }
 
     private static ICollection<GenderResponse> EntityListToResponseList(IEnumerable<Gender> GenreList)

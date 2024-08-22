@@ -30,8 +30,6 @@ public class Artist
         }
     }
 
-
-
     public override string ToString()
     {
         return $@"Id: {Id}

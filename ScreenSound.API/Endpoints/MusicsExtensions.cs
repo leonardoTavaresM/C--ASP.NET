@@ -34,7 +34,9 @@ public static class MusicsExtensions
             return Results.Ok(EntityToResponse(music));
         });
 
-        app.MapPost("/musics", ([FromServices] DAL<Music> dal, [FromBody] MusicRequest musicRequest) =>
+        app.MapPost("/musics", ([FromServices] DAL<Music> dal,
+            [FromServices] DAL<Gender> dalGender,
+            [FromBody] MusicRequest musicRequest) =>
         {
             var existingMusic = dal.GetBy(m => m.Name!.Equals(musicRequest.name, StringComparison.OrdinalIgnoreCase));
 
@@ -45,7 +47,9 @@ public static class MusicsExtensions
 
             var music = new Music(musicRequest.name, musicRequest.releaseYear, musicRequest.artistId)
             {
-                Genres = musicRequest.Genres is not null? GenderRequestParser(musicRequest.Genres) : new List<Gender>()
+                Genres = musicRequest.Genres is not null? GenderRequestParser(musicRequest.Genres,
+                dalGender
+                ) : new List<Gender>()
             };
             dal.Add(music);
             return Results.Ok(EntityToResponse(music));
@@ -80,9 +84,24 @@ public static class MusicsExtensions
         });
     }
 
-    private static ICollection<Gender> GenderRequestParser(ICollection<GenderRequest> genres)
+    private static ICollection<Gender> GenderRequestParser(ICollection<GenderRequest> genres, DAL<Gender> dalGender)
     {
-        return genres.Select(a => RequestToEntity(a)).ToList();
+        var listGender = new List<Gender>();
+        foreach (var item in genres) 
+        {
+            var entity = RequestToEntity(item);
+            var gender = dalGender.GetBy(g => g.Name.ToUpper().Equals(item.Name.ToUpper()));
+
+            if(gender is not null)
+            {
+                listGender.Add(gender);
+            }
+            else
+            {
+                listGender.Add(entity);
+            }
+        }
+        return listGender;
     }
 
     private static Gender RequestToEntity(GenderRequest gender)
